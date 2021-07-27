@@ -26,6 +26,7 @@
  */
 
 // If global `URL` constructor is available, use it
+const AES256 = require('aes-everywhere');
 const URL_ = typeof URL === 'function' ? URL : require('url-parse')
 const { Plugin } = require('@uppy/core')
 const Translator = require('@uppy/utils/lib/Translator')
@@ -189,6 +190,7 @@ module.exports = class AwsS3 extends Plugin {
 
         const {
           method = 'post',
+          proxy_url,
           url,
           fields,
           headers,
@@ -196,11 +198,13 @@ module.exports = class AwsS3 extends Plugin {
         const xhrOpts = {
           method,
           formData: method.toLowerCase() === 'post',
-          endpoint: url,
+          endpoint: proxy_url || url,
           metaFields: fields ? Object.keys(fields) : [],
         }
 
         if (headers) {
+          if (proxy_url)
+            headers['X-S3-Endpoint'] = AES256.encrypt('(params.url);
           xhrOpts.headers = headers
         }
 
